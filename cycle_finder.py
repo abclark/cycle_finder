@@ -2,7 +2,7 @@
 =======================================
 cycle_finder.py
 =======================================
-Determines whether a graph G = (V,E) has a cycle of length 2k, and if it does, outputs one cuch cycle.
+Determines whether a graph G = (V,E) has a cycle of length k, and if it does, outputs one such cycle.
 """
 
 #: The current version of this package.
