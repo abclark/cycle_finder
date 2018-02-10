@@ -3,6 +3,30 @@
 cycle_finder.py
 =======================================
 Determines whether a graph G = (V,E) has a cycle of length k, and if it does, outputs one such cycle.
+
+Given graph G = (V, E)
+
+Key objects:
+        1) F(i,j,p): family of interior points of all paths from vertex i to j of length p
+        2) B(q,i,j,p):
+        —tree of height at most q
+        —nodes labeled by elements of F(i,j,p) or a special symbol lambda
+        —nodes have one successor for each element of their label
+        —this edge is labeled with this element
+        -nodes labeled with either an element of F(i,j,p) that is disjoint from the collection of edge labels leading to that node or, if no such element exists, lambda
+
+Algorithm 1: given B(q,i,j,p), and (up to?) q vertices T, compute U in F(i,j,p) disjoint from T in O(p.q)
+        —search in B(q,i,j,p) (whose collection of node labels q-representative of F(i,j,p), see Monien 1985)
+Algorithm 2: Given B(q,i,j,p) for all i,j, compute B(q-1,u,v,p+1) in O(q.(p+1)^q.degree(u))
+        —wish to label a node, let L denote edge labels leading to that node
+        —search for edge (u,w) with w not in L
+        —if none, label node lambda; otherwise,
+        —apply Algorithm 1 to B(q,w,v,p) with T = L U {u}, label with output
+Main algorithm:
+        —F(i,j,0) is {i,j} if in E or empty, B(k-1,i,j,0) is the singleton node labeled {i,j} or lambda
+        —Apply Algorithm 2 to get B(k-2,i,j,1) for all i,j
+        -Repeat, B(0,u,v,k-1) has singleton node labeled lambda if no path between u and v exists
+        —otherwise, a path between u and v does exist and the label is its internal vertices
 """
 
 #: The current version of this package.
