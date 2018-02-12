@@ -27,6 +27,17 @@ Main algorithm:
         —Apply Algorithm 2 to get B(k-2,i,j,1) for all i,j
         -Repeat, B(0,u,v,k-1) has singleton node labeled lambda if no path between u and v exists
         —otherwise, a path between u and v does exist and the label is its internal vertices
+
+Example:
+
+>>> T = nx.DiGraph()
+>>> T.add_edges_from([(frozenset({1, 6}), frozenset({8, 3}), {'label': 1}), (frozenset({1, 6}), frozenset({4, 7}), {'label': 6}), (frozenset({8, 3}), frozenset({2, 4}), {'label': 8}), (frozenset({8, 3}), frozenset({8, 4}), {'label': 3}), (frozenset({4, 7}), frozenset({1, 7}), {'label': 4}), (frozenset({4, 7}), frozenset({1, 5}), {'label': 7}), (frozenset({2, 4}), frozenset({3, 6}), {'label': 4}), (frozenset({2, 4}), frozenset({4, 7}), {'label': 2}), (frozenset({8, 4}), frozenset({2, 4}), {'label': 8}), (frozenset({8, 4}), 'LAMBDA', {'label': 4}), (frozenset({1, 7}), frozenset({1, 5}), {'label': 7}), (frozenset({1, 7}), frozenset({8, 3}), {'label': 1}), (frozenset({1, 5}), frozenset({2, 4}), {'label': 1}), (frozenset({1, 5}), frozenset({8, 3}), {'label': 5})])
+>>> U = find_root(T)
+>>> K = {6,4,7}
+>>> disjoint_set(T, K, U)
+frozenset({1, 5})
+>>> 
+
 """
 
 #: The current version of this package.
@@ -42,6 +53,28 @@ from pprint import pprint
 
 #global things
 tolerance = np.finfo(np.float).eps*10e10
+
+# a function that finds the root of a tree
+def find_root(tree):
+  return([n for n,d in tree.in_degree() if d==0].pop())
+
+# The following function implements Algorithm 1
+# Need to get the function to return instead of print
+def disjoint_set(T, K, U):
+  if U =='LAMBDA':
+    print(U)
+  elif not bool(U&K):
+    print(U)
+  else:                    
+    children = list(T.neighbors(U))
+    while children != []:      
+      try:
+        child = children.pop()
+        if T[U][child]['label'] in K & U:
+          U = child
+          disjoint_set(T, K, U)
+      except KeyError:
+        pass
 
 # given node in tree, disjoint set compares node and its decendents with set until it finds a node
 # who is disjoint from set
