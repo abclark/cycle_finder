@@ -26,60 +26,6 @@ Main algorithm:
         -Repeat, B(0,u,v,k-1) has singleton node labeled lambda if no path between u and v exists
         —otherwise, a path between u and v does exist and the label is its internal vertices
 
-Example:
-
-G = nx.Graph()
-G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,9),(5,6),(6,9),(7,9),(8,9)])
-
-Below we have the 3-tree for F(0,9,2)
-
-T = nx.DiGraph()
-T.add_edges_from([(frozenset({1, 6}), frozenset({8, 3}), {'label': 1}), (frozenset({1, 6}), frozenset({4, 7}), {'label': 6}), (frozenset({8, 3}), frozenset({2, 4}), {'label': 8}), (frozenset({8, 3}), frozenset({8, 4}), {'label': 3}), (frozenset({4, 7}), frozenset({1, 7}), {'label': 4}), (frozenset({4, 7}), frozenset({1, 5}), {'label': 7}), (frozenset({2, 4}), frozenset({3, 6}), {'label': 4}), (frozenset({2, 4}), frozenset({4, 7}), {'label': 2}), (frozenset({8, 4}), frozenset({2, 4}), {'label': 8}), (frozenset({8, 4}), 'LAMBDA', {'label': 4}), (frozenset({1, 7}), frozenset({1, 5}), {'label': 7}), (frozenset({1, 7}), frozenset({8, 3}), {'label': 1}), (frozenset({1, 5}), frozenset({2, 4}), {'label': 1}), (frozenset({1, 5}), frozenset({8, 3}), {'label': 5})])
-
-T = nx.DiGraph()
-T.add_edges_from([(0,1,{'weight': 1}), (0, 2, {'weight': 6}), (1,3, {'weight': 8}), (1, 4, {'weight': 3}), (2, 5, {'weight': 4}), (2, 6, {'weight': 7}), (3, 7, {'weight': 4}), (3, 8, {'weight': 2}), (4, 9, {'weight': 8}), (4, 10, {'weight': 4}), (5, 11, {'weight': 7}), (5,  12, {'weight': 1}), (6, 13, {'weight': 1}), (6, 14, {'weight': 5})])
-
-dict = {0:frozenset({1, 6}), 1: frozenset({8, 3}), 2: frozenset({4, 7}), 3: frozenset({2, 4}), 4: frozenset({8, 4}), 5: frozenset({1, 7}), 6: frozenset({1, 5}), 7: frozenset({3, 6}), 8: frozenset({4, 7}), 9: frozenset({2, 4}), 10: 'LAMBDA', 11: frozenset({1, 5}), 12: frozenset({8, 3}), 13: frozenset({2, 4}), 14: frozenset({8, 3})}
-
-nx.set_node_attributes(T, dict, 'label')
-
-U = find_root(T)
-K = {6,4,7}
-disjoint_set(T, K, U)
-frozenset({1, 5})
-
-A simpler graph
-
-G = nx.Graph()
-G.add_edges_from([(0,1),(1,2),(0,2)])
-
-Let's search for a path from 0 to 2 of length 2
-
-B2010 = nx.DiGraph()
-B2010.add_node(frozenset({0,1}))
-B2020 = nx.DiGraph()
-B2020.add_node('LAMBDA')
-B2120 = nx.DiGraph()
-B2120.add_node(frozenset({1,2}))
-
-We compute
-
-B1011 = nx.DiGraph()
-B1011.add_node('LAMBDA')
-B1021 = nx.DiGraph()
-B1021.add_node('LAMBDA')
-B1121 = nx.DiGraph()
-B1121.add_node('LAMBDA')
-
-Then
-
-B0012 = nx.DiGraph()
-B0012.add_node(frozenset({0,1}))
-B0022 = nx.DiGraph()
-B0022.add_node('LAMBDA')
-B0122 = nx.DiGraph()
-B0122.add_node(frozenset({1,2}))
-
 """
 
 #: The current version of this package.
@@ -93,32 +39,21 @@ import math
 import sys
 from pprint import pprint
 
-#global things
-tolerance = np.finfo(np.float).eps*10e10
-
-# a function that finds the root of a tree
-def find_root(tree):
-  return([n for n,d in tree.in_degree() if d==0].pop())
-
-def get_node_labels(graph, nodes, attribute):
-  labels = [graph.nodes[x][attribute] for x in nodes]
-  return labels
-
-# The following function implements Algorithm 1
-# Need to get the function to return instead of print
-def disjoint_set(T, K, U):
+def disjoint_set(T, K, starting_node):
+  labels = nx.get_node_attributes(T, 'label')
+  U = set(labels[starting_node])
   if U =='LAMBDA':
     return(U)
   elif not bool(U&K):
     return(U)
   else:
-    children = [T.nodes[x]['label'] for x in T.neighbors(U)]
+    children = list(T.neighbors(starting_node))
     while children != []:
       try:
         child = children.pop()
-        if T[U][child]['label'] in K & U:
-          U = child
-          return disjoint_set(T, K, U)
+        if T[starting_node][child]['weight'] in K & U:
+          starting_node = child
+          return disjoint_set(T, K, starting_node)
       except KeyError:
         pass
 
@@ -128,104 +63,67 @@ def initial_tree_maker(G):
   for x in itertools.product(*[G.nodes(),G.nodes]):
     D.update({x:nx.DiGraph()})
     if x in G.edges():
-      D[x].add_node(frozenset({}))
+      D[x].add_node(1, label = {})
     else:
-      D[x].add_node('LAMBDA')
+      D[x].add_node(1, label = 'LAMBDA')
   return(D)
 
-def initial_next_generation_node(G, D):
-  P = {}
-  for (u,v) in G.edges():
-    B = nx.DiGraph()
-    N = [x for x in G.neighbors(u) if x != v]
-    if N == []:
-      B.add_node('LAMBDA')
-    else:
-      w = N.pop()
-      U = disjoint_set(D[(w,v)],{w},find_root(D[(w,v)]))
-      B.add_node(U)
-    P.update({(u,v):B})
-  return(P)
-
-def root_leaf(tree, root, leaf):
-  H = set()
-  H.update({leaf})
-  p = list(tree.predecessors(leaf))
-  if p != []:
-    return(root_leaf(tree, root, p.pop()))
-  else:
-    return(H)
-
-
-def next_generation(G, P):
-  for (u,v) in G.edges():
-    B = P[u,v]
-    L = [x for x in B.nodes() if B.out_degree(x) == 0]
-    root = find_root(B)
-    for leaf in L:
-      path = root_leaf(B,root, leaf)
-    if N == []:
-      B.add_node('LAMBDA')
-    else:
-      w = N.pop()
-      U = disjoint_set(D[(w,v)],{w},find_root(D[(w,v)]))
-      B.add_node(U)
-    P.update({(u,v):B})
-  return(P)
-
-
-
+def initial_tree_dictionary(G):
+  D = {}
+  for x in itertools.product(*[G.nodes(),G.nodes]):
     D.update({x:nx.DiGraph()})
-    D[x].add_node(frozenset)
-
-  B = nx.DiGraph()
-  D = {dictionary of trees}
-  N = [x for x in list(G.neighbors(u)) if x != v]
-  for w in N:
-    U = disjoint_set(D[(w,v)],K,find_root(D[(w,v)]).pop())
-      if U = 'LAMBDA':
-        B.add_edges_from([(V,U)])
+  return(D)
 
 
+def root_leaf_edge_set(tree, starting_node, leaf):
+  H = set()
+  while leaf != starting_node:
+    e = tree[[*tree.predecessors(leaf)].pop()][leaf]['weight']
+    H.update({e})
+    leaf = [*tree.predecessors(leaf)].pop()
+  return(H)
 
-G = nx.Graph()
-G.add_edges_from([(0,1),(1,2),(0,2)])
+def find_root(tree):
+  return([n for n,d in tree.in_degree() if d==0].pop())
 
- = nx.DiGraph()
-2010.add_node(frozenset({0,1}))
-
-'2020' = nx.DiGraph()
-2020.add_node('LAMBDA')
-
-2120 = nx.DiGraph()
-2120.add_node(frozenset({1,2}))
-
-D = {(0,1):nx.DiGraph(),(0,2):nx.DiGraph(),(1,2): nx.DiGraph()}
-
-# given node in tree, disjoint set compares node and its decendents with set until it finds a node
-# who is disjoint from set
-def disjoint_set(tree,set,node):
-  if bool(node & set) = False:
-    return(node)
-  elseif node & set = {lambda}:
-    return(lambda)
-  else:
-
-    for sonedge, son node in sons:
-      disjoint_set(tree, set, sonnode)
-
-# iterate through nodes of tree, finding a U that is disjoint from set
-# or concluding that no such set exists
-def disjoint_set_finder(tree, set)
-  for node in nodesoftree:
-    if disjoint_set(tree, set, node) != lambda:
-      return disjoint_set(tree, set, node)
-    else:
-      return lambda
-
-def tree_maker(tree_list_indexed_by_edges, set):
-  tree = {}
-  # start at level i node, having constructed the tree to level i-1
-  # collect in a set E the edge labels from root to node
-  # label node as disjoint_set(tree,E,)
+def next_generation(G, P, K, q):
+  # G is the graph
+  # P is the previous generation of trees
+  # K is the current generation of trees
+  # u and v are nodes, we want to build the u, v tree for this generation
+  R = copy.deepcopy(K)
+  for (u,v) in set(itertools.product(*[G.nodes(),G.nodes])):
+    N = [x for x in G.neighbors(u) if x != v]
+    # if N is the empty list, move to next index (u,v)
+    if N != []:
+      w = N.pop()
+      L = [x for x in R[(u,v)].nodes() if R[(u,v)].out_degree(x) == 0]
+      # if L is the empty list, don't compute edge set and label root
+      if len(L) == 0:
+        U = disjoint_set(P[(w,v)], {w}, 1)
+        # if U is 'LAMBDA' there is no path from w to v
+        if U == 'LAMBDA':
+           R[(u,v)].add_nodes_from([(1 ,{'label': 'LAMBDA'})])
+        else:
+           V = U.update({w})
+           R[(u,v)].add_nodes_from([(1,{'label': V})])
+      else:
+        # if L is not the empty list, compute path from root to leaf
+        for i,leaf in enumerate(L):
+        # if leaf is LAMBDA we can move to the next leaf
+          if labels[leaf] != 'LAMBDA':
+            path = root_leaf_edge_set(R[(u,v)], 1, leaf)
+            # if depth is q we can move to next leaf
+            if len(path) < q:
+              for z in labels[leaf]:
+                U = disjoint_set(P[(w,v)], path, 1)
+                if U == 'LAMBDA':
+                  j = i + 1
+                  R[(u,v)].add_nodes_from([('leaf' + 'j', {'label': 'LAMBDA'})])
+                  R[(u,v)].add_edges_from([(leaf, 'leaf' + 'j', {'label': z})])
+                else:
+                  V = U.update({w})
+                  R[(u,v)].add_nodes_from([('leaf' + 'j', {'label': V})])
+                  R[(u,v)].add_edges_from([(leaf, 'leaf' + 'j', {'label': z})])
+  return(R)
                                                                
