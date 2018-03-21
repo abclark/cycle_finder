@@ -122,19 +122,24 @@ def next_generation(G, P, K, q):
         # if leaf is LAMBDA we can move to the next leaf
           if leaf != {'LAMBDA'}:
             path = root_leaf_edge_set(R[(u,v)], 1, leaf)
-            path.update({u})
             # if depth is q we can move to next leaf
             if len(path) < q:
+              E = path & {u}
               for i,z in list(enumerate(labels[leaf])):
-                U = disjoint_set(P[(w,v)], path, 1)
+                U = disjoint_set(P[(w,v)], E, 1)
                 if U == {'LAMBDA'}:
                   j = i + 1
                   R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': {'LAMBDA'}})])
-                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'label': z})])
+                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
+                elif z == w:
+                  j = i + 1
+                  R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': {'LAMBDA'}})])
+                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
                 else:
+                  j = i + 1
                   U.update({w})
                   R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': U})])
-                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'label': z})])
+                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
   return(R)
 
                                                                
