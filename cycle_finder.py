@@ -86,6 +86,18 @@ def root_leaf_edge_set(tree, starting_node, leaf):
 def find_root(tree):
   return([n for n,d in tree.in_degree() if d==0].pop())
 
+def generation(G,P,q):
+  A[-1] = initial_tree_dictionary(G)
+  for i in range(q+1):
+    A[i] = next_generation(G, P, A[i-1], q)
+  return(A[q])
+   
+def solution_generation(G,k):
+  B[-1] = initial_tree_maker(G)
+  for j in range(k-1):
+    B[j] = generation(G,B[j-1],k-j-2)
+  return(B[k-2])
+
 
 T = nx.DiGraph()
 
@@ -120,12 +132,12 @@ def next_generation(G, P, K, q):
         labels = nx.get_node_attributes(R[(u,v)], 'label')
         for leaf in L:
         # if leaf is LAMBDA we can move to the next leaf
-          if leaf != {'LAMBDA'}:
+          if labels[leaf] != {'LAMBDA'}:
             path = root_leaf_edge_set(R[(u,v)], 1, leaf)
             # if depth is q we can move to next leaf
             if len(path) < q:
-              E = path & {u}
               for i,z in list(enumerate(labels[leaf])):
+                E = path | {u} | {z}
                 U = disjoint_set(P[(w,v)], E, 1)
                 if U == {'LAMBDA'}:
                   j = i + 1
@@ -141,5 +153,4 @@ def next_generation(G, P, K, q):
                   R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': U})])
                   R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
   return(R)
-
                                                                
