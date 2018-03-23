@@ -37,7 +37,6 @@ import copy
 import itertools
 import math
 import sys
-from pprint import pprint
 
 def disjoint_set(T, K, starting_node):
   labels = nx.get_node_attributes(T, 'label')
@@ -74,7 +73,6 @@ def initial_tree_dictionary(G):
     D.update({x:nx.DiGraph()})
   return(D)
 
-
 def root_leaf_edge_set(tree, starting_node, leaf):
   H = set()
   while leaf != starting_node:
@@ -82,28 +80,6 @@ def root_leaf_edge_set(tree, starting_node, leaf):
     H.update({e})
     leaf = [*tree.predecessors(leaf)].pop()
   return(H)
-
-def find_root(tree):
-  return([n for n,d in tree.in_degree() if d==0].pop())
-
-def generation(G,P,q):
-  A[-1] = initial_tree_dictionary(G)
-  for i in range(q+1):
-    A[i] = next_generation(G, P, A[i-1], q)
-  return(A[q])
-   
-def solution_generation(G,k):
-  B[-1] = initial_tree_maker(G)
-  for j in range(k-1):
-    B[j] = generation(G,B[j-1],k-j-2)
-  return(B[k-2])
-
-
-T = nx.DiGraph()
-
-T.add_nodes_from([(1, {'label': {1,6}} ), (11, {'label' : {3,8}} ), (12, {'label': {4,7} }), (111, {'label': {2,4}}), (112, {'label' : {4,8}}), (121, {'label' : {1,7}}), (122, {'label' : {1,5} }), (1111, {'label' : {3,6}}), (1112, {'label' : {4,7}}), (1121, {'label': {2,4}}), (1122, {'label': 'LAMBDA'}), (1211, {'label': {1,5}}), (1212, {'label': {3,8}}), (1221, {'label': {2,4}}), (1222, {'label': {3,8}}) ] )
-
-T.add_edges_from([(1, 11, {'weight': 1}), (1, 12, {'weight': 6}), (11, 111, {'weight': 8}), (11, 112, {'weight': 3}), (12, 121, {'weight': 4}), (12, 122, {'weight': 7}), (111, 1111, {'weight': 4}), (111, 1112, {'weight': 2}), (112, 1121, {'weight': 8}), (112, 1122, {'weight': 4}), (121, 1211 , {'weight': 7}), (121, 1212, {'weight': 1}), (122, 1221, {'weight': 1}), (122, 1222, {'weight': 5})])
 
 def next_generation(G, P, K, q):
   # G is the graph
@@ -157,3 +133,16 @@ def key_step(N, P, E, v):
         return([U,w])
   return([{'LAMBDA'},w])
                                                                
+
+ def generation(G,P,q):
+  A[-1] = initial_tree_dictionary(G)
+  for i in range(q+1):
+    A[i] = next_generation(G, P, A[i-1], q)
+  return(A[q])
+   
+def path_finder(G,k):
+  B[-1] = initial_tree_maker(G)
+  for j in range(k-1):
+    B[j] = generation(G,B[j-1],k-j-2)
+  return(B[k-2])       
+        
