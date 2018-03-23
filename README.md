@@ -40,5 +40,5 @@ Z = path_finder(G,length_of_path)
 NodeDataView({1: {'label': {1, 2, 4, 7}}})
 >>> </code></pre>
 
-<p>The output of <code>constrained_birkhoff_von_neumann_decomposition(X,constraint_structure)</code> is a list. Its first entry is the distribution over basis matrices, its second entry is the list of basis matrices (in order), and its third and fourth entries are checks that the probabilities sum to one and that the expected basis matrix is the target, <code>X</code>.</p>
+<p>The output of <code>path_finder(G,k)</code> is a dictionary of directed graphs, indexed by paire of nodes <code>u,v</code>, and each consisting of a single vertex. The vertex is labelled <code>'LAMBDA'</code> if and only if there is no path of length  <code>k</code> from <code>u</code> to <code>v</code>; otherwise it is labelled with the internal vertices of such a path.</p>
 
