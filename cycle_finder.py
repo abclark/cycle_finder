@@ -116,18 +116,17 @@ def next_generation(G, P, K, q):
     if N == []:
       R[(u,v)].add_nodes_from([(1 ,{'label': {'LAMBDA'}})])
     else:
-      w = N.pop()
       L = [x for x in R[(u,v)].nodes() if R[(u,v)].out_degree(x) == 0]
       # if L is the empty list, don't compute edge set and label root
       if len(L) == 0:
-        U = disjoint_set(P[(w,v)], {u}, 1)
-        # if U is 'LAMBDA' there is no path from w to v
+        [U,w] = key_step(N, P, {u}, v)
+       # if U is 'LAMBDA' there is no path from w to v
         if U == {'LAMBDA'}:
-           R[(u,v)].add_nodes_from([(1 ,{'label': {'LAMBDA'}})])
+          R[(u,v)].add_nodes_from([(1 ,{'label': {'LAMBDA'}})])
         else:
-           U.update({w})
-           R[(u,v)].add_nodes_from([(1,{'label': U})])
-      else:
+          U.update({w})
+          R[(u,v)].add_nodes_from([(1,{'label': U})])   
+      else: 
         # if L is not the empty list, compute path from root to leaf
         labels = nx.get_node_attributes(R[(u,v)], 'label')
         for leaf in L:
@@ -138,19 +137,23 @@ def next_generation(G, P, K, q):
             if len(path) < q:
               for i,z in list(enumerate(labels[leaf])):
                 E = path | {u} | {z}
-                U = disjoint_set(P[(w,v)], E, 1)
+                [U,w] = key_step(N, P, E, v)
                 if U == {'LAMBDA'}:
                   j = i + 1
                   R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': {'LAMBDA'}})])
                   R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
-                elif z == w:
+                else: 
                   j = i + 1
-                  R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': {'LAMBDA'}})])
-                  R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
-                else:
-                  j = i + 1
-                  U.update({w})
-                  R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': U})])
+                  V = U | {w}
+                  R[(u,v)].add_nodes_from([(int(str(leaf) + str(j)), {'label': V})])
                   R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
   return(R)
+  
+def key_step(N, P, E, v):
+  for w in N:
+    U = disjoint_set(P[(w,v)], E, 1)
+    if U != {'LAMBDA'}:
+      if w not in E:
+        return([U,w])
+  return([{'LAMBDA'},w])
                                                                
