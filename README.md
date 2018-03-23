@@ -48,4 +48,4 @@ NodeDataView({1: {'label': {'LAMBDA'}}})
 
 <p>The output of <code>find_paths(G,k)</code> is a dictionary of directed graphs, indexed by pairs of nodes <code>u,v</code>, each consisting of a single labelled root node. The root node is labelled with <code>'LAMBDA'</code> if and only if there is no path of length <code>k</code> from node <code>u</code> to <code>v</code>; otherwise its label is the internal nodes of one such path.</p>
 
-<p>In the above, there is a simple path of length <code>5</code> between the nodes <code>0</code> and <code>9</code> of the graph <code>G</code>, but not of length <code>6</code>.</p>
+<p>In the above, there is a simple path of length <code>5</code> between the nodes <code>0</code> and <code>9</code> of the graph <code>G</code>, but there is no such path of length <code>6</code>.</p>
