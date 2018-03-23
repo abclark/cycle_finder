@@ -6,7 +6,7 @@ Given a directed graph G = (V,E), find_paths(G,k) computes whether there is a si
 
 find_paths(G,k) is a dictionary of directed graphs, indexed by pairs of nodes u,v, each directed graph consisting of a single labelled root node. 
 
-This root node is labelled with 'LAMBDA' if and only if there is no path of length k from node u to v; 
+This root node is labelled with 'LAMBDA' if there is no path of length k from node u to v; 
 otherwise the label is the the internal nodes of one such a path. 
 
 For example, in the following there is a path of length 5 between nodes 0 and 9, 
@@ -42,6 +42,7 @@ import itertools
 import math
 import sys
 
+#disjoint_set traverses a tree T starting at starting_node in search for a set U that is disjoint from K
 def disjoint_set(T, K, starting_node):
   labels = nx.get_node_attributes(T, 'label')
   U = set(labels[starting_node])
@@ -60,6 +61,8 @@ def disjoint_set(T, K, starting_node):
       except KeyError:
         pass
 
+# initial_tree_maker constructs the initial dictionary of trees for the inductive process of Monien 1985
+# these are the "k-1 trees" for the sets "F^0_ij" (see Monien 1985)
 def initial_tree_maker(G):
   # get basic structure of initial trees
   D = {}
@@ -71,20 +74,27 @@ def initial_tree_maker(G):
       D[x].add_node(1, label = {'LAMBDA'})
   return(D)
 
+# initial_tree_dictionary generates the new dictionary of trees
+# we update these trees using the past generation of trees (which in the first step is given by initial_tree_maker)
 def initial_tree_dictionary(G):
   D = {}
   for x in itertools.product(*[G.nodes(),G.nodes]):
     D.update({x:nx.DiGraph()})
   return(D)
 
-def root_leaf_edge_set(tree, starting_node, leaf):
+# given a tree, root_leaf_edge_set collects the edge labels on the path between start_node and end_node
+def root_leaf_edge_set(tree, start_node, end_node):
   H = set()
-  while leaf != starting_node:
-    e = tree[[*tree.predecessors(leaf)].pop()][leaf]['weight']
+  while end_node != start_node:
+    e = tree[[*tree.predecessors(end_node)].pop()][end_node]['weight']
     H.update({e})
-    leaf = [*tree.predecessors(leaf)].pop()
+    leaf = [*tree.predecessors(end_node)].pop()
   return(H)
 
+# next_generation adds a layer to the trees of the next_generation K using the previous generation of trees P
+# Formally, P is the dictionary consisting of "r-trees" for the sets F^p_ij for all i,j
+# next_generation adds a layer to the construction of "r-1 trees" for the sets F^p+1_ij for all i,j
+# applying this iteratively ultimately gives the "0 trees" for the sets F^k-1_ij, which give the solution
 def next_generation(G, P, K, q):
   # G is the graph
   # P is the previous generation of trees
@@ -129,6 +139,7 @@ def next_generation(G, P, K, q):
                   R[(u,v)].add_edges_from([(leaf, int(str(leaf) + str(j)), {'weight': z})])
   return(R)
   
+# key_step is the key step in next_generation        
 def key_step(N, P, E, v):
   for w in N:
     U = disjoint_set(P[(w,v)], E, 1)
@@ -137,13 +148,14 @@ def key_step(N, P, E, v):
         return([U,w])
   return([{'LAMBDA'},w])
                                                                
-
+# generation iteratively applies next generation to construct the new generation of trees
  def generation(G,P,q):
   A[-1] = initial_tree_dictionary(G)
   for i in range(q+1):
     A[i] = next_generation(G, P, A[i-1], q)
   return(A[q])
-   
+    
+# find_paths iteratively applies generation, yielding the solution 
 def find_paths(G,k):
   B[-1] = initial_tree_maker(G)
   for j in range(k-1):
