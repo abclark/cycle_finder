@@ -2,9 +2,9 @@
 =======================================
 cycle_finder.py
 =======================================
-Given a directed graph G = (V,E), path_finder(G,k) computes whether there is a simple path (a path that does not repeat any nodes) between any two nodes u and v.  
+Given a directed graph G = (V,E), find_path(G,k) computes whether there is a simple path (a path that does not repeat any nodes) between any two nodes u and v.  
 
-path_finder(G,k) is a dictionary of directed graphs, indexed by pairs of nodes u,v, each directed graph consisting of a single labelled root node. 
+find_path(G,k) is a dictionary of directed graphs, indexed by pairs of nodes u,v, each directed graph consisting of a single labelled root node. 
 
 This root node is labelled with 'LAMBDA' if and only if there is no path of length k from node u to v; 
 otherwise the label is the the internal nodes of one such a path. 
@@ -16,10 +16,10 @@ however there is no path of length 6 between these two nodes
 >>> from cycle_finder import path_finder
 >>> G = nx.DiGraph()
 >>> G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,6),(5,9),(6,9),(7,9),(8,9)])
->>> Z = path_finder(G,5)
+>>> Z = find_path(G,5)
 >>> Z[0,9].nodes(data=True)
 NodeDataView({1: {'label': {1, 2, 4, 7}}})
->>> Z = solution_generation(G,6)
+>>> Z = find_path(G,6)
 >>> Z[0,9].nodes(data=True)
 NodeDataView({1: {'label': {'LAMBDA'}}})
 
@@ -144,7 +144,7 @@ def key_step(N, P, E, v):
     A[i] = next_generation(G, P, A[i-1], q)
   return(A[q])
    
-def path_finder(G,k):
+def find_path(G,k):
   B[-1] = initial_tree_maker(G)
   for j in range(k-1):
     B[j] = generation(G,B[j-1],k-j-2)
