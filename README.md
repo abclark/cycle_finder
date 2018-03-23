@@ -15,14 +15,14 @@ Download <code>cycle_finder.py</code>
 <h2 id="Basic usage">Basic usage</h2>
         
 <pre><code>import networkx as nx
-from cycle_finder import path_finder
+from cycle_finder import find_path
 
 # Create a directed graph
 
 G = nx.DiGraph()
 G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,6),(5,9),(6,9),(7,9),(8,9)])
 
-Z = path_finder(G,length_of_path)
+Z = find_path(G,length_of_path)
 </code></pre>
         
 <h2 id="Mathematical background">Mathematical background</h2>
@@ -32,13 +32,17 @@ Z = path_finder(G,length_of_path)
 <h2 id="API">API</h2>
         
  <pre><code>>>> import networkx as nx
->>> from cycle_finder import path_finder
+>>> from cycle_finder import find_path
 >>> G = nx.DiGraph()
 >>> G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,6),(5,9),(6,9),(7,9),(8,9)])
->>> Z = path_finder(G,5)
+>>> Z = find_path(G,5)
 >>> Z[0,9].nodes(data=True)
 NodeDataView({1: {'label': {1, 2, 4, 7}}})
+>>> Z = find_path(G,6)
+>>> Z[0,9].nodes(data=True)
+NodeDataView({1: {'label': {'LAMBDA'}}})
 >>> </code></pre>
 
 <p>The output of <code>path_finder(G,k)</code> is a dictionary of directed graphs, indexed by pairs of nodes <code>u,v</code>, each consisting of a single labelled root node. The root node is labelled with <code>'LAMBDA'</code> if and only if there is no path of length <code>k</code> from node <code>u</code> to <code>v</code>; otherwise the label is the the internal nodes of one such a path.</p>
 
+<p>In the above, there is a simple path of length <code>5</code> between the nodes <code>0</code> and <code>9</code> of the graph <code>G</code>, but no such simple path of length <code>6</code>.</p>
