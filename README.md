@@ -40,5 +40,5 @@ Z = path_finder(G,length_of_path)
 NodeDataView({1: {'label': {1, 2, 4, 7}}})
 >>> </code></pre>
 
-<p>The output of <code>path_finder(G,k)</code> is a dictionary of directed graphs, indexed by paire of nodes <code>u,v</code>, and each consisting of a single vertex. The vertex is labelled <code>'LAMBDA'</code> if and only if there is no path of length  <code>k</code> from <code>u</code> to <code>v</code>; otherwise it is labelled with the internal vertices of such a path.</p>
+<p>The output of <code>path_finder(G,k)</code> is a dictionary of directed graphs, indexed by pairs of nodes <code>u,v</code>, each consisting of a single labelled root node. The root node is labelled with <code>'LAMBDA'</code> if and only if there is no path of length <code>k</code> from node <code>u</code> to <code>v</code>; otherwise the label is the the internal nodes of one such a path.</p>
 
