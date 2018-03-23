@@ -2,30 +2,28 @@
 =======================================
 cycle_finder.py
 =======================================
-Determines whether a graph G = (V,E) has a cycle of length k, and if it does, outputs one such cycle.
-Given graph G = (V, E)
-Key objects:
-        
-        1) F(i,j,p): family of sets of interior points of each path from vertex i to j of length p+1
-        2) B(q,i,j,p):
-        —tree of height at most q
-        —nodes labeled by elements of F(i,j,p) or a special symbol lambda
-        —nodes have one successor for each element of their label
-        —this edge is labeled with this element
-        -nodes labeled with either an element of F(i,j,p) that is disjoint from the collection of edge labels leading to that node or, if no such element exists, lambda
-Algorithm 1: given B(q,i,j,p), and (up to?) q vertices T, compute U in F(i,j,p) disjoint from T in O(p.q)
-        —search in B(q,i,j,p) (whose collection of node labels q-representative of F(i,j,p), see Monien 1985)
-Algorithm 2: Given B(q,i,j,p) for all i,j, compute B(q-1,u,v,p+1) in O(q.(p+1)^q.degree(u))
-        —wish to label a node, let L denote edge labels leading to that node
-        —search for edge (u,w) with w not in L
-        —if none, label node lambda; otherwise,
-        —apply Algorithm 1 to B(q,w,v,p) with T = L U {u}, label with output U {w}
-Main algorithm:
-        —F(i,j,0) is the empty set if {i,j} is in E and otherwise the empty family; B(k-1,i,j,0) is a tree with a single node labeled with the empty set in the former case and 'LAMBDA' in the latter
-        —Apply Algorithm 2 to get B(k-2,i,j,1) for all i,j
-        -Repeat, B(0,u,v,k-1) has singleton node labeled lambda if no path between u and v exists
-        —otherwise, a path between u and v does exist and the label is its internal vertices
+Given a directed graph G = (V,E), path_finder(G,k) computes whether there is a simple path (a path that does not repeat any nodes) between any two nodes u and v.  
 
+path_finder(G,k) is a dictionary of directed graphs, indexed by pairs of nodes u,v, each directed graph consisting of a single labelled root node. 
+
+This root node is labelled with 'LAMBDA' if and only if there is no path of length k from node u to v; 
+otherwise the label is the the internal nodes of one such a path. 
+
+For example, in the following there is a path of length 5 between nodes 0 and 9, 
+however there is no path of length 6 between these two nodes
+
+>>> import networkx as nx
+>>> from cycle_finder import path_finder
+>>> G = nx.DiGraph()
+>>> G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,6),(5,9),(6,9),(7,9),(8,9)])
+>>> Z = path_finder(G,5)
+>>> Z[0,9].nodes(data=True)
+NodeDataView({1: {'label': {1, 2, 4, 7}}})
+>>> Z = solution_generation(G,6)
+>>> Z[0,9].nodes(data=True)
+NodeDataView({1: {'label': {'LAMBDA'}}})
+
+The algorithm is an implementation of Monien 1985: 'How to find long paths efficiently'
 """
 
 #: The current version of this package.
