@@ -24,6 +24,12 @@ NodeDataView({1: {'label': {1, 2, 4, 7}}})
 NodeDataView({1: {'label': {'LAMBDA'}}})
 
 The algorithm is an implementation of Monien 1985: 'How to find long paths efficiently'
+
+Copyright 2017 Aubrey Clark.
+
+cycle_finder is free software: you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the Free Software Foundation, 
+either version 3 of the License, or (at your option) any later version.
 """
 
 #: The current version of this package.
