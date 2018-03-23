@@ -1,5 +1,7 @@
 # cycle_finder
 
+<p>We implement the algorithm of Monien 1985 'How to find long paths efficiently' for finding simple paths of a given length.</p>
+  
 <p>For a directed graph <code>G = (V,E)</code>, <code>find_paths(G,k)</code> computes whether there exist simple paths (paths that do not repeat nodes) of length <code>k</code> between any nodes <code>u</code> and <code>v</code>. If such a path exists its interior nodes are computed.</p>
               
 <p>Contents<br>       
