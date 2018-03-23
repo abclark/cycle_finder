@@ -14,19 +14,15 @@ Download <code>cycle_finder.py</code>
         
 <h2 id="Basic usage">Basic usage</h2>
         
-<pre><code>import numpy as np
-import networkx as nx
+<pre><code>import networkx as nx
 from cycle_finder import path_finder
 
 # Create a directed graph
-#
-#For example
-#
+
 G = nx.DiGraph()
 G.add_edges_from([(0,1),(0,2),(0,3),(0,4),(1,5),(1,6),(1,2),(2,4),(3,6),(3,8),(4,7),(4,8),(4,9),(5,6),(5,9),(6,9),(7,9),(8,9)])
-#
-#  
-path_finder(G,length_of_path)
+
+Z = path_finder(G,length_of_path)
 </code></pre>
         
 <h2 id="Mathematical background">Mathematical background</h2>
