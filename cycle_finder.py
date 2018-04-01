@@ -48,7 +48,7 @@ def disjoint_set(T, K, starting_node):
   U = set(labels[starting_node])
   if U =={'LAMBDA'}:
     return(U)
-  elif not bool(set(U)&K):
+  elif not bool(U&K):
     return(U)
   else:
     children = list(T.neighbors(starting_node))
@@ -88,7 +88,7 @@ def root_leaf_edge_set(tree, start_node, end_node):
   while end_node != start_node:
     e = tree[[*tree.predecessors(end_node)].pop()][end_node]['weight']
     H.update({e})
-    leaf = [*tree.predecessors(end_node)].pop()
+    end_node = [*tree.predecessors(end_node)].pop()
   return(H)
 
 # next_generation adds a layer to the trees of the next_generation K using the previous generation of trees P
