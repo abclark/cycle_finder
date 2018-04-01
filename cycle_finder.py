@@ -149,16 +149,16 @@ def key_step(N, P, E, v):
   return([{'LAMBDA'},w])
                                                                
 # generation iteratively applies next generation to construct the new generation of trees
- def generation(G,P,q):
-  A[-1] = initial_tree_dictionary(G)
+def generation(G,P,q):
+  A = initial_tree_dictionary(G)
   for i in range(q+1):
-    A[i] = next_generation(G, P, A[i-1], q)
-  return(A[q])
+    A = next_generation(G, P, A, q)
+  return(A)
     
 # find_paths iteratively applies generation, yielding the solution 
 def find_paths(G,k):
-  B[-1] = initial_tree_maker(G)
+  B = initial_tree_maker(G)
   for j in range(k-1):
-    B[j] = generation(G,B[j-1],k-j-2)
-  return(B[k-2])       
+    B = generation(G,B,k-j-2)
+  return(B)       
         
