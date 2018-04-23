@@ -1,6 +1,6 @@
 # cycle_finder
 
-Computes for each pair of nodes in a directed graph whether a simple path of given length exists, and if so returns its interior nodes.</p>
+Computes for each pair of nodes in a directed graph whether a simple path of a given length exists, and if so returns its interior nodes.</p>
               
 <p>Contents<br>       
   <a href="#Installation">Installation</a><br>
