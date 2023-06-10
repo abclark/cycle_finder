@@ -1,6 +1,6 @@
 # cycle_finder
 
-This is Python code implementing the algorithm of <a href="https://abclark.github.io/notes/Monien85.pdf">Monien 1985</a> for finding paths in a directed graph. It computes for each pair of nodes whether a simple path of a specified length exists between them, and if so returns its interior nodes.</p>
+This is Python code implementing the algorithm of [Monien 1985](Monien1985.pdf) for finding paths in a directed graph. It computes for each pair of nodes whether a simple path of a specified length exists between them, and if so returns its interior nodes.</p>
               
 <p>Contents<br>       
   <a href="#Installation">Installation</a><br>
@@ -28,7 +28,7 @@ Z = find_paths(G,length_of_path)
         
 <h2 id="Mathematical background">Mathematical background</h2>
        
-<p>See <a href="https://abclark.github.io/notes/Monien85.pdf">Monien 1985</a>.</p>
+<p>See [Monien 1985](Monien1985.pdf).</p>
 
 <h2 id="API">API</h2>
         
